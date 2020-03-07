@@ -15,12 +15,14 @@ public class App {
 
         try {
             tweeter.follow("bob", "alex");
-            tweeter.tweet("bob", "b");
-            tweeter.tweet("bob", "a");
-            //tweeter.block("alex", "bob");
-            tweeter.tweet("alex", "second tweet");
-            tweeter.follow("charles", "bob");
+            tweeter.tweet("bob", "bddedede");
+            tweeter.tweet("bob", "c");
+            //tweeter.follow("charles", "alex");
             tweeter.follow("alex", "bob");
+            tweeter.tweet("alex", "d");
+            tweeter.tweet("alex", "aa");
+            tweeter.block("bob", "charles");
+            tweeter.block("alex", "charles");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -29,6 +31,7 @@ public class App {
         System.out.println("Most popular user: " + stats.getMostFollowedUser());
         System.out.println("Length of the longest tweet: " + stats.getLengthOfLongestTweet());
         System.out.println("Most popular message: " + stats.getMostPopularMessage());
+        System.out.println("Most blocked follower by number of followees: " + stats.getMostBlockedFollowerByNumberOfFollowees());
         ctx.close();
     }
 }

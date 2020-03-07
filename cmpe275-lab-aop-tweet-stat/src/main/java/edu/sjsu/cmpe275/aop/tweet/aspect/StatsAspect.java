@@ -37,4 +37,12 @@ public class StatsAspect {
 		System.out.printf("After validating the executuion of the method %s\n", joinPoint.getSignature().getName());
 	}
 	
+	@AfterReturning(pointcut="execution(public void edu.sjsu.cmpe275.aop.tweet.TweetService.block(..))", returning = "retVal")
+	public void validatedBlock(JoinPoint joinPoint, Object retVal){
+		String user = (String) joinPoint.getArgs()[0];
+		String follower = (String) joinPoint.getArgs()[1];
+		stats.addBlocker(user, follower);
+		System.out.printf("After validating the executuion of the method %s\n", joinPoint.getSignature().getName());
+	}
+		
 }

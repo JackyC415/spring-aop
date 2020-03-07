@@ -21,7 +21,7 @@ public class ValidationAspect {
 		String msg = (String) joinPoint.getArgs()[1];
 		
 		if(msg.length() > 140 || msg == null || user == null || msg.isEmpty() || user.isEmpty()) {
-			throw new IllegalArgumentException("Invalid tweet input!");
+			throw new IllegalArgumentException("invalid tweet input!");
 		}
 	}
 	

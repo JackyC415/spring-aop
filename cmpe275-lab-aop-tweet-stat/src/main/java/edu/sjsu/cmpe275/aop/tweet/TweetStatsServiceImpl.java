@@ -20,12 +20,15 @@ public class TweetStatsServiceImpl implements TweetStatsService {
 	private static Map<String, ArrayList<String>> tweetMap = new HashMap<String, ArrayList<String>>();
 	private static Map<String, TreeSet<String>> distinctTweetMap = new HashMap<String, TreeSet<String>>();
 	private static Map<String, Set<String>> followerMap = new HashMap<String, Set<String>>();
+	private static Map<String, Set<String>> blockerMap = new HashMap<String, Set<String>>();
 
 	@Override
 	public void resetStatsAndSystem() {
 		lengthOfLongestTweet = 0;
+		mostFollowedUser = null;
 		tweetMap.clear();
 		followerMap.clear();
+		blockerMap.clear();
 	}
 	
 	public void addTweets(String user, String message) {
@@ -37,7 +40,7 @@ public class TweetStatsServiceImpl implements TweetStatsService {
 	}
 	
 	public void addFollowers(String follower, String followee) {
-		if(followerMap.containsKey(follower)) {
+		if(followerMap.containsKey(followee)) {
 			followerMap.get(followee).add(follower);
 		} else {
 			followerMap.put(followee, new HashSet<String>(Arrays.asList(follower)));
@@ -52,8 +55,18 @@ public class TweetStatsServiceImpl implements TweetStatsService {
 		}
 	}
 	
+	public void addBlocker(String user, String follower) {
+		if(followerMap.containsKey(follower)) {
+			blockerMap.get(follower).add(user);
+		} else {
+			blockerMap.put(follower, new HashSet<String>(Arrays.asList(user)));
+		}
+	}
+	
 	@Override
 	public int getLengthOfLongestTweet() {
+		
+		if(tweetMap.isEmpty()) return 0;
 
 		ArrayList<String> compareTweetLengthList = new ArrayList<String>();
 
@@ -74,6 +87,8 @@ public class TweetStatsServiceImpl implements TweetStatsService {
 
 	@Override
 	public String getMostFollowedUser() {
+		
+		if(followerMap.isEmpty()) return null;
 
 		Map<String, Integer> mostFollowedUserMap = new TreeMap<String, Integer>();
 
@@ -92,7 +107,7 @@ public class TweetStatsServiceImpl implements TweetStatsService {
 			}
 
 			if (!mostFollowedUserMap.isEmpty()) {
-				mostFollowedUser = (String) mostFollowedUserMap.keySet().toArray()[0];
+				mostFollowedUser = mostFollowedUserMap.keySet().stream().findFirst().get();
 			}
 		}
 
@@ -143,7 +158,7 @@ public class TweetStatsServiceImpl implements TweetStatsService {
 					userSet.add(entry.getKey());
 				}
 			}
-			mostProductiveUser = (String) userSet.toArray()[0];
+			mostProductiveUser = userSet.stream().findFirst().get();
 		} else {
 			//get the user with highest tweet length
 			for (Map.Entry<String, Integer> entry : userTweetLengthMap.entrySet()) {
@@ -167,7 +182,29 @@ public class TweetStatsServiceImpl implements TweetStatsService {
 	@Override
 	public String getMostBlockedFollowerByNumberOfFollowees() {
 		
-		return null;
+		if(blockerMap.isEmpty()) return null;
+		
+		String mostBlockedFollower = null;
+		int numOfBlocksByFollowees = Integer.MIN_VALUE;
+		for (Map.Entry<String, Set<String>> entry : blockerMap.entrySet()) {
+			if(entry.getValue().size() > numOfBlocksByFollowees) {
+				numOfBlocksByFollowees = entry.getValue().size();
+				mostBlockedFollower = entry.getKey();
+			}
+		}
+		
+		int frequencyOfSameMaxBlocks = Collections.frequency(blockerMap.values(), numOfBlocksByFollowees);
+		Set<String> mostBlockedFollowersSet = new TreeSet<String>();
+		if(frequencyOfSameMaxBlocks > 1) {
+			for (Map.Entry<String, Set<String>> entry : blockerMap.entrySet()) {
+				if(entry.getValue().size() == numOfBlocksByFollowees) {
+					mostBlockedFollowersSet.add(entry.getKey());
+				}
+			}
+			mostBlockedFollower = mostBlockedFollowersSet.stream().findFirst().get();
+		}
+		
+		return mostBlockedFollower;
 	}
 	
 }

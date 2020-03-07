@@ -16,7 +16,7 @@ public class RetryAspect {
      * @throws Throwable 
      */
 	
-	private final static int maximumRetries = 3;
+	//private final static int maximumRetries = 3;
 	
 	@Around("execution(public int edu.sjsu.cmpe275.aop.tweet.TweetService.*(..))")
 	public void retryNetworkFailure(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -25,26 +25,21 @@ public class RetryAspect {
 		
 		System.out.printf("Prior to the executuion of the method %s\n", joinPoint.getSignature().getName());
 		
-		
 		try {
 			joinPoint.proceed();
 		} catch(IOException e1) {
-			e1.printStackTrace();
-			System.out.println("Retrying network failure first attempt...");
+			System.out.println("Retrying network failure; first attempt...");
 			try {
 				joinPoint.proceed();
 			} catch(IOException e2) {
-				e2.printStackTrace();
-				System.out.println("Retrying network failure second attempt...");
+				System.out.println("Retrying network failure; second attempt...");
 				try {
 					joinPoint.proceed();
 				} catch (IOException e3) {
-					e3.printStackTrace();
-					System.out.println("Retrying network failure final attempt...");
+					System.out.println("Retrying network failure; final attempt...");
 					try {
 						joinPoint.proceed();
 					} catch (IOException e4) {
-						e4.printStackTrace();
 						System.out.println("Aborted, network failure!");
 						throw e4;
 					}
@@ -53,6 +48,7 @@ public class RetryAspect {
 		}
 		
 		
+		/*
 		int attempt = 0;
 		while(attempt <= maximumRetries) {
 			try {
@@ -69,7 +65,6 @@ public class RetryAspect {
 		}
 		
 		
-		/*
 		for(int attempt = 1; attempt <= maximumRetries; attempt++) {
 			try {
 				result = (Integer) joinPoint.proceed();
